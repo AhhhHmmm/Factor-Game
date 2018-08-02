@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Factor Game</title>
+
+	<style type="text/css">
+		body {
+			background: #afffb6;
+			font-size: 30px;
+			font-family: monospace;
+		}
+
+		.box {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.stack {
+			text-align: center;
+		}
+
+		p {
+			margin-bottom: 2px;
+			margin-top: 2px;
+		}
+
+		h2 {
+			text-align: center;
+			font-family: Monoton, cursive;
+		}
+
+		input[type="text"] {
+			font-size: 30px;
+			color: blue;
+			width: 1em;
+			height: 1em;		}
+	</style>
+</head>
+<body>
+	<p id="streak">Streak: <span id="counter">0</span></p>
+	<p id="highScore">High Score: <span id="highScoreValue">0</span></p>
+	<h2>Factoring Game!</h2>
+	<div class="box">
+		<div class="stack">
+			<p id="problem">$x^2+7x+10$</p>
+			<p id="factored">$(x+$<input type="text" name="factor1" id="factor1">$)(x+$<input type="text" name="factor2" id="factor2">$)$</p>
+			<button id="submit">Submit</button>
+		</div>
+	</div>
+
+	<script type="text/x-mathjax-config">
+	MathJax.Hub.Config({
+	  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+	  messageStyle: "none"
+	});
+	</script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+	<script src='/Users/admin/Desktop/Programming/HTML, CSS, Javascript/Javascript/Project 22 - Factoring Game/mathjax-2.7.1/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+	<script type="text/javascript">
+		const body = document.querySelector('body');
+		const problem = document.querySelector('#problem');
+		const factor1 = document.querySelector('#factor1');
+		const factor2 = document.querySelector('#factor2');
+		const submit = document.querySelector('#submit');
+		const counterElement = document.querySelector('#counter');
+		const highScoreValue = document.querySelector('#highScoreValue')
+
+		let counter = 0;
+
+		let sum = 7;
+		let product = 10;
+
+		function createProblem() {
+			// Create factors first, then generate problem
+			let x1 = Math.floor(10*Math.random());
+			let x2 = Math.floor(10*Math.random());
+
+			sum = x1 + x2;
+			product = x1 * x2;
+
+			while (sum === 0 || product === 0) {
+				console.log('Redoing because one of the coefficients was 0.')
+				x1 = Math.floor(10*Math.random());
+				x2 = Math.floor(10*Math.random());
+
+				sum = x1 + x2;
+				product = x1 * x2;
+			}
+
+			problemText = `$x^2+${sum}x+${product}$`
+			console.log(problemText)
+			problem.innerHTML = problemText;
+			factor1.value = '';
+			factor2.value = '';
+			factor1.focus();
+			MathJax.Hub.Queue(["Typeset",MathJax.Hub,problem]);
+		}
+
+		function checkAnswers() {
+			let factor1Value = Number(factor1.value);
+			let factor2Value = Number(factor2.value);
+			
+			if ((factor1Value + factor2Value === sum) && (factor1Value * factor2Value === product)) {
+				console.log('Correct!');
+
+				body.style.background = '#afffb6';
+				counter = counter + 1;
+				counterElement.innerHTML = counter;
+				if (counter > Number(highScoreValue.innerHTML)) {
+					highScoreValue.innerHTML = counter;
+				}
+				createProblem();
+			}
+
+			else {
+				console.log('Incorrect!');
+				body.style.background = '#ffb2b2';
+				counter = 0;
+				counterElement.innerHTML = counter;
+				factor1.focus();
+			}
+		};
+
+		document.addEventListener('DOMContentLoaded', function() {
+			createProblem();
+			factor1.focus();
+		});
+
+		submit.addEventListener("click", function() {
+			checkAnswers();
+			factor1.focus();
+		});
+
+		factor1.addEventListener("keydown", function(e) {
+			if (e.key == "Tab") {
+				factor2.focus();
+				e.preventDefault();
+			};
+		});
+
+		factor2.addEventListener("keydown", function(e) {
+			if (e.key == "Tab") {
+				submit.focus();
+				e.preventDefault();
+			}
+		});	
+
+		submit.addEventListener("keydown", function(e) {
+			if (e.key == "Tab") {
+				factor1.focus();
+				e.preventDefault();
+			}
+		});	
+
+		document.addEventListener("keydown", function(e) {
+			if (e.key == "Enter") {
+				checkAnswers(); 
+			}
+		});
+	</script>
+</body>
+</html>
