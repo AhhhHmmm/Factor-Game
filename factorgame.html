@@ -33,7 +33,7 @@
 		input[type="text"] {
 			font-size: 30px;
 			color: blue;
-			width: 1em;
+			width: 1.5em;
 			height: 1em;		}
 	</style>
 </head>
@@ -44,7 +44,7 @@
 	<div class="box">
 		<div class="stack">
 			<p id="problem">$x^2+7x+10$</p>
-			<p id="factored">$(x+$<input type="text" name="factor1" id="factor1">$)(x+$<input type="text" name="factor2" id="factor2">$)$</p>
+			<p id="factored">$(x$<input type="text" name="factor1" id="factor1">$)(x$<input type="text" name="factor2" id="factor2">$)$</p>
 			<button id="submit">Submit</button>
 		</div>
 	</div>
@@ -74,8 +74,10 @@
 
 		function createProblem() {
 			// Create factors first, then generate problem
-			let x1 = Math.floor(10*Math.random());
-			let x2 = Math.floor(10*Math.random());
+			let polarity1 = Math.floor(2*Math.random());
+			let polarity2 = Math.floor(2*Math.random());
+			let x1 = Math.pow(-1,polarity1)*Math.floor(10*Math.random());
+			let x2 = Math.pow(-1,polarity2)*Math.floor(10*Math.random());
 
 			sum = x1 + x2;
 			product = x1 * x2;
@@ -89,7 +91,20 @@
 				product = x1 * x2;
 			}
 
-			problemText = `$x^2+${sum}x+${product}$`
+			if (sum > 0 && product > 0) {
+				problemText = `$x^2+${Math.abs(sum)}x+${Math.abs(product)}$`;
+			}
+			else if (sum < 0 && product > 0) {
+				problemText = `$x^2-${Math.abs(sum)}x+${Math.abs(product)}$`;
+			}
+
+			else if (sum > 0 && product < 0) {
+				problemText = `$x^2+${Math.abs(sum)}x-${Math.abs(product)}$`;
+			}
+			else {
+				problemText = `$x^2-${Math.abs(sum)}x-${Math.abs(product)}$`;
+			}
+
 			console.log(problemText)
 			problem.innerHTML = problemText;
 			factor1.value = '';
