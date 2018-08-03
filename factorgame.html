@@ -4,6 +4,7 @@
 	<title>Factor Game</title>
 
 	<meta name="viewport" content="width=device-width">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 
 	<link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
 
@@ -102,7 +103,7 @@
 	</script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 
-	<script src='/Users/admin/Desktop/Programming/HTML, CSS, Javascript/Javascript/Project 22 - Factoring Game/mathjax-2.7.1/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+	<!-- <script src='/Users/admin/Desktop/Programming/HTML, CSS, Javascript/Javascript/Project 22 - Factoring Game/mathjax-2.7.1/MathJax.js?config=TeX-MML-AM_CHTML' async></script> -->
 	<script type="text/javascript">
 		const body = document.querySelector('body');
 		const problem = document.querySelector('#problem');
@@ -115,6 +116,7 @@
 		const signs = ['+','−'];
 
 		let counter = 0;
+		let highScoreNumber;
 
 		let sum = 7;
 		let product = 10;
@@ -171,7 +173,9 @@
 					counter = counter + 1;
 					counterElement.innerHTML = counter;
 					if (counter > Number(highScoreValue.innerHTML)) {
-						highScoreValue.innerHTML = counter;
+						highScoreNumber = counter;
+						highScoreValue.innerHTML = highScoreNumber;
+						document.cookie = `highScoreCookie=${highScoreNumber}`
 					}
 					createProblem();
 				}
@@ -192,6 +196,10 @@
 		};
 
 		document.addEventListener('DOMContentLoaded', function() {
+			highScoreNumber = document.cookie.replace(/(?:(?:^|.*;\s*)highScoreCookie\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+			if (highScoreNumber) {
+				highScoreValue.innerHTML = highScoreNumber;
+			}
 			createProblem();
 			factor1.focus();
 		});
