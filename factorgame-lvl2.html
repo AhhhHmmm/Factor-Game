@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Factor Game (Level 2)</title>
+
+	<meta name="viewport" content="width=device-width">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+	<link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
+
+	<style type="text/css">
+		body {
+			background: #afffb6;
+			font-size: 30px;
+			font-family: monospace;
+			background-image: url("topography.svg");
+			background-size: 340px, auto;
+			min-height: calc(100vh - 100px);
+			background-position: fixed;
+		}
+
+		.box {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.stack {
+			text-align: center;
+			background: #fefefe;
+			padding: 20px 140px 20px 140px;
+			box-shadow: 0 0 10px 10px lightblue;
+		}
+
+		@media only screen and (max-width: 600px) {
+			.stack {
+				padding: 20px 50px 20px 50px;
+			}
+		}
+
+		.stack-item {
+			margin-bottom: 15px;
+		}
+
+		p {
+			margin-bottom: 2px;
+			margin-top: 2px;
+		}
+
+		h2, h3 {
+			text-align: center;
+			font-family: Monoton, cursive;
+		}
+
+		input[type="text"] {
+			font-size: 30px;
+			color: #0047bc;
+			width: 2em;
+			height: 1em;
+			font-family: MJXc-TeX-main-R,MJXc-TeX-main-Rw;
+			white-space: pre;
+			border-collapse: separate;
+			box-sizing: content-box!important;
+		}
+
+		#submit {
+			font-size: 20px;
+			border-radius: 10px;
+			border: 2px solid lightgray;
+			font-family: monospace;
+			box-shadow: 2px 2px gray;
+/*			height: 90px;
+			width: 90px;*/
+			padding: 5px 10px 5px 10px;
+			background: #fdfdfd;
+		}
+
+		#submit:active, #submit:focus{
+			outline: none;
+			border: none;
+			box-shadow: none;
+			box-shadow: 0 0 3px 3px #a5c8ec;
+		}
+	</style>
+</head>
+<body>
+	<p id="streak">Streak: <span id="counter">0</span></p>
+	<p id="highScore">High Score: <span id="highScoreValue">0</span></p>
+	<h2>Factoring Game!</h2>
+	<h3>-- Level 2 --</h3>
+	<div class="box">
+		<div class="stack">
+			<p id="problem" class="stack-item">$x^2+7x+10$</p>
+			<p id="factored" class="stack-item">$(x$<input type="text" name="factor1" id="factor1">$)(x$<input type="text" name="factor2" id="factor2">$)$</p>
+			<button id="submit" class="stack-item">Submit</button>
+		</div>
+	</div>
+
+	<div id="star-five"></div>
+
+	<script type="text/x-mathjax-config">
+	MathJax.Hub.Config({
+	  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+	  messageStyle: "none"
+	});
+	</script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+	<!-- <script src='/Users/admin/Desktop/Programming/HTML, CSS, Javascript/Javascript/Project 22 - Factoring Game/mathjax-2.7.1/MathJax.js?config=TeX-MML-AM_CHTML' async></script> -->
+	<script type="text/javascript">
+		const highestNumber = 20;
+		const body = document.querySelector('body');
+		const problem = document.querySelector('#problem');
+		const factor1 = document.querySelector('#factor1');
+		const factor2 = document.querySelector('#factor2');
+		const submit = document.querySelector('#submit');
+		const counterElement = document.querySelector('#counter');
+		const highScoreValue = document.querySelector('#highScoreValue')
+
+		const signs = ['+','−'];
+
+		let counter = 0;
+		let highScoreNumber;
+
+		let sum = 7;
+		let product = 10;
+
+		function createProblem() {
+			// Create factors first, then generate problem
+			let polarity1 = Math.floor(2*Math.random());
+			let polarity2 = Math.floor(2*Math.random());
+			let x1 = Math.pow(-1,polarity1)*Math.floor(highestNumber*Math.random());
+			let x2 = Math.pow(-1,polarity2)*Math.floor(highestNumber*Math.random());
+
+			sum = x1 + x2;
+			product = x1 * x2;
+
+			while (sum === 0 || product === 0) {
+				x1 = Math.floor(highestNumber*Math.random());
+				x2 = Math.floor(highestNumber*Math.random());
+
+				sum = x1 + x2;
+				product = x1 * x2;
+			}
+
+			if (sum > 0 && product > 0) {
+				problemText = `$x^2+${Math.abs(sum)}x+${Math.abs(product)}$`;
+			}
+			else if (sum < 0 && product > 0) {
+				problemText = `$x^2-${Math.abs(sum)}x+${Math.abs(product)}$`;
+			}
+
+			else if (sum > 0 && product < 0) {
+				problemText = `$x^2+${Math.abs(sum)}x-${Math.abs(product)}$`;
+			}
+			else {
+				problemText = `$x^2-${Math.abs(sum)}x-${Math.abs(product)}$`;
+			}
+
+			problem.innerHTML = problemText;
+			factor1.value = '';
+			factor2.value = '';
+			factor1.focus();
+			MathJax.Hub.Queue(["Typeset",MathJax.Hub,problem]);
+		}
+
+		function checkAnswers() {
+			let factor1Value = factor1.value;
+			let factor2Value = factor2.value;
+			
+			if ((signs.indexOf(factor1Value[0]) != -1) && (signs.indexOf(factor2Value[0]) != -1)) {
+				factor1Value = Number(factor1Value.replace("−","-"));
+				factor2Value = Number(factor2Value.replace("−","-"));
+				if ((factor1Value + factor2Value === sum) && (factor1Value * factor2Value === product)) {
+
+					body.style.background = '#afffb6';
+					counter = counter + 1;
+					counterElement.innerHTML = counter;
+					if (counter > Number(highScoreValue.innerHTML)) {
+						highScoreNumber = counter;
+						highScoreValue.innerHTML = highScoreNumber;
+						document.cookie = `highScoreCookie=${highScoreNumber}`
+					}
+					createProblem();
+				}
+
+				else {
+					body.style.background = '#ffb2b2';
+					counter = 0;
+					counterElement.innerHTML = counter;
+					factor1.focus();
+				}
+			}
+			else {
+				body.style.background = '#ffb2b2';
+				counter = 0;
+				counterElement.innerHTML = counter;
+				factor1.focus();
+			}
+		};
+
+		document.addEventListener('DOMContentLoaded', function() {
+			highScoreNumber = document.cookie.replace(/(?:(?:^|.*;\s*)highScoreCookie\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+			if (highScoreNumber) {
+				highScoreValue.innerHTML = highScoreNumber;
+			}
+			createProblem();
+			factor1.focus();
+		});
+
+		submit.addEventListener("click", function() {
+			checkAnswers();
+			factor1.focus();
+		});
+
+		factor1.addEventListener("keydown", function(e) {
+			if (e.key == "Tab") {
+				factor2.focus();
+				e.preventDefault();
+			}
+			else if (e.key == "-") {
+				factor1.value += "−";
+				e.preventDefault();
+			}
+		});
+
+		factor2.addEventListener("keydown", function(e) {
+			if (e.key == "Tab") {
+				submit.focus();
+				e.preventDefault();
+			}
+			else if (e.key == "-") {
+				factor2.value += "−";
+				e.preventDefault();
+			}
+		});	
+
+		submit.addEventListener("keydown", function(e) {
+			if (e.key == "Tab") {
+				factor1.focus();
+				e.preventDefault();
+			}
+		});	
+
+		document.addEventListener("keydown", function(e) {
+			if (e.key == "Enter") {
+				checkAnswers(); 
+			}
+		});
+	</script>
+</body>
+</html>
